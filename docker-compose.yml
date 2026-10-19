@@ -1,0 +1,19 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: mockmate
+      POSTGRES_PASSWORD: mockmate
+      POSTGRES_DB: mockmate
+    ports: ["5432:5432"]
+  redis:
+    image: redis:7-alpine
+    ports: ["6379:6379"]
+  api:
+    build: ./api
+    environment:
+      DATABASE_URL: postgresql://mockmate:mockmate@db:5432/mockmate
+      REDIS_URL: redis://redis:6379/0
+      MOCKMATE_SEARCH: fixture
+    ports: ["8101:8101"]
+    depends_on: [db, redis]
