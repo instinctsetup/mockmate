@@ -1,0 +1,29 @@
+* { box-sizing: border-box; margin: 0; }
+body { background: #0c0f14; color: #e6e9ef; font-family: -apple-system, "Segoe UI", Roboto, sans-serif; }
+header { padding: 22px 32px; border-bottom: 1px solid #1d2530; display: flex; align-items: baseline; gap: 14px; }
+header h1 { font-size: 24px; }
+header h1 span { color: #f59e0b; }
+header p { color: #7d8aa0; font-size: 13px; }
+main { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 24px 32px; max-width: 1280px; margin: 0 auto; }
+.card { background: #12161d; border: 1px solid #1d2530; border-radius: 12px; padding: 20px; }
+.card h2 { font-size: 16px; margin-bottom: 12px; color: #9fb0c7; text-transform: uppercase; letter-spacing: .06em; }
+.card.wide { grid-column: 1 / -1; }
+input, select { background: #0c0f14; border: 1px solid #2a3546; color: #e6e9ef; border-radius: 8px; padding: 9px 12px; font-size: 14px; }
+button { background: #f59e0b; color: #14100a; border: 0; border-radius: 8px; padding: 9px 16px; font-weight: 600; cursor: pointer; }
+button:disabled { opacity: .5; }
+.row { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+.item { border: 1px solid #1d2530; border-radius: 8px; padding: 12px; margin-bottom: 10px; background: #0e1218; }
+.item a { color: #6ea8fe; text-decoration: none; font-size: 14px; font-weight: 600; }
+.item a:hover { text-decoration: underline; }
+.item p { color: #8fa0b8; font-size: 13px; margin-top: 5px; }
+.badge { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 99px; margin-right: 6px; margin-top: 6px; }
+.badge.src { background: #173026; color: #4ade80; }
+.badge.model { background: #3a2a12; color: #fbbf24; }
+.badge.easy { background: #123312; color: #4ade80; }
+.badge.medium { background: #3a2a12; color: #fbbf24; }
+.badge.hard { background: #3a1212; color: #f87171; }
+.badge.topic { background: #16283f; color: #7cc4ff; }
+.note { color: #66788f; font-size: 12px; margin-top: 12px; line-height: 1.5; }
+.sol { background: #0c0f14; border-left: 3px solid #f59e0b; padding: 10px 12px; margin-top: 8px; font-size: 13px; color: #c9d4e5; }
+.q { cursor: pointer; }
+.meta { color: #66788f; font-size: 12px; }
