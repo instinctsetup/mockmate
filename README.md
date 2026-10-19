@@ -51,7 +51,7 @@ fixture provider, which tests and CI use).
 ## Tests
 
 ```bash
-python3 -m pytest tests/ -q     # 11 tests: providers, OA bank, API, fallbacks
+python3 -m pytest tests/ -q     # 9 tests: providers, OA bank, API, fallbacks
 cd web && npx tsc --noEmit      # strict typecheck (also in CI)
 ```
 
