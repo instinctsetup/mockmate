@@ -36,8 +36,11 @@ def using_redis() -> bool:
 def get_json(key: str):
     r = _client()
     if r is not None:
-        raw = r.get(key)
-        return json.loads(raw) if raw else None
+        try:
+            raw = r.get(key)
+            return json.loads(raw) if raw else None
+        except Exception:
+            _drop_client()
     ent = _mem.get(key)
     if ent and ent[0] > time.time():
         return json.loads(ent[1])
@@ -48,6 +51,15 @@ def set_json(key: str, value, ttl: int = TTL):
     raw = json.dumps(value)
     r = _client()
     if r is not None:
-        r.setex(key, ttl, raw)
-    else:
-        _mem[key] = (time.time() + ttl, raw)
+        try:
+            r.setex(key, ttl, raw)
+            return
+        except Exception:
+            _drop_client()
+    _mem[key] = (time.time() + ttl, raw)
+
+
+def _drop_client():
+    """Drop a broken Redis client so the next call reconnects or falls back."""
+    global _redis
+    _redis = None

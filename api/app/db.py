@@ -3,10 +3,14 @@
 The app stays fully functional for demos without Postgres; docker-compose
 wires the real thing. Same for Redis (cache.py).
 """
+import itertools
 import os
+import threading
 
 _pool = None
 _mem: dict = {}
+_id_seq = itertools.count(1)
+_init_lock = threading.Lock()
 
 
 def using_postgres() -> bool:
@@ -19,19 +23,22 @@ def _conn():
         return None
     if _pool is not None:
         return _pool
-    url = os.environ.get("DATABASE_URL")
-    if not url:
-        _pool = False
-        return None
-    try:
-        import psycopg2
-        _pool = psycopg2.connect(url)
-        _pool.autocommit = True
-        _init_schema(_pool)
-        return _pool
-    except Exception:
-        _pool = False
-        return None
+    with _init_lock:                      # one connector wins the first-request race
+        if _pool is not None:
+            return _pool or None
+        url = os.environ.get("DATABASE_URL")
+        if not url:
+            _pool = False
+            return None
+        try:
+            import psycopg2
+            _pool = psycopg2.connect(url)
+            _pool.autocommit = True
+            _init_schema(_pool)
+            return _pool
+        except Exception:
+            _pool = False
+            return None
 
 
 def _init_schema(conn):
@@ -45,22 +52,44 @@ def _init_schema(conn):
         )""")
 
 
+def _mem_save(company: str, notes: str = "") -> int:
+    sid = next(_id_seq)                   # unique even under concurrency
+    _mem[sid] = {"company": company, "notes": notes}
+    return sid
+
+
 def save_session(company: str, notes: str = "") -> int:
     conn = _conn()
     if conn is None:
-        sid = len(_mem) + 1
-        _mem[sid] = {"company": company, "notes": notes}
-        return sid
-    with conn.cursor() as cur:
-        cur.execute("INSERT INTO sessions (company, notes) VALUES (%s, %s) RETURNING id",
-                    (company, notes))
-        return cur.fetchone()[0]
+        return _mem_save(company, notes)
+    try:
+        with conn.cursor() as cur:
+            cur.execute("INSERT INTO sessions (company, notes) VALUES (%s, %s) RETURNING id",
+                        (company, notes))
+            return cur.fetchone()[0]
+    except Exception:
+        _drop_conn()
+        return _mem_save(company, notes)
+
+
+def _drop_conn():
+    """Drop a broken connection so the next call reconnects or falls back."""
+    global _pool
+    try:
+        _pool.close()
+    except Exception:
+        pass
+    _pool = None
 
 
 def list_sessions() -> list[dict]:
     conn = _conn()
     if conn is None:
         return [{"id": k, **v} for k, v in _mem.items()]
-    with conn.cursor() as cur:
-        cur.execute("SELECT id, company, notes, created_at FROM sessions ORDER BY id DESC LIMIT 50")
-        return [{"id": r[0], "company": r[1], "notes": r[2], "created_at": str(r[3])} for r in cur.fetchall()]
+    try:
+        with conn.cursor() as cur:
+            cur.execute("SELECT id, company, notes, created_at FROM sessions ORDER BY id DESC LIMIT 50")
+            return [{"id": r[0], "company": r[1], "notes": r[2], "created_at": str(r[3])} for r in cur.fetchall()]
+    except Exception:
+        _drop_conn()
+        return [{"id": k, **v} for k, v in _mem.items()]
