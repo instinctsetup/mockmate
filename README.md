@@ -4,9 +4,10 @@ Interview prep, grounded in sources. Company-prep intel and an OA question
 bank where **every item carries a source URL and every model-written answer is
 labeled as one** - plus practice-session logging.
 
+- **Live demo**: https://mockmate-web.onrender.com (API: https://mockmate-api-ogk7.onrender.com)
 - **Demo video**: https://drive.google.com/file/d/16ELJeiM3hAnckwhd2OgwmAasvK0jLtk2/view
 - **Project report (PDF)**: https://drive.google.com/file/d/1WApCYVpfEfxf9i_cClhRB4jIu1cb8CbH/view
-- Repo: https://github.com/instinctsetup/mockmate
+- Repo: https://github.com/ursthakurmahesh/mockmate
 
 ## What it does
 
