@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 
-const API = "http://localhost:8101";
+const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8101";
 
 type Intel = { title: string; url: string; snippet: string; kind: string; source: string; model_written: boolean };
 type Q = { id: string; title: string; difficulty: string; topics: string[]; url: string; companies: string[]; model_written: boolean };
